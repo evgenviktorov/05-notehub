@@ -97,7 +97,6 @@ export default function NoteForm({ onClose }: NoteFormProps) {
 				{formik.touched.tag && formik.errors.tag && (
 					<span className={css.error}>{formik.errors.tag}</span>
 				)}
-				<span className={css.error} />
 			</div>
 
 			<div className={css.actions}>

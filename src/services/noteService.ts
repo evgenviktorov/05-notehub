@@ -28,8 +28,6 @@ export const fetchNotes = async (
 		}
 	)
 
-	console.log('API response:', response.data) // <--- ДОДАЙ ЦЕ
-
 	return response.data
 }
 
@@ -51,8 +49,6 @@ export const createNote = async (note: CreateNoteData): Promise<Note> => {
 			},
 		}
 	)
-
-	console.log('Note created:', response.data)
 
 	return response.data
 }
