@@ -17,6 +17,7 @@ export default function App() {
 	const { data, isLoading, isError } = useQuery({
 		queryKey: ['notes', page, debouncedSearch],
 		queryFn: () => fetchNotes(page, debouncedSearch),
+		placeholderData: previousData => previousData,
 	})
 
 	return (

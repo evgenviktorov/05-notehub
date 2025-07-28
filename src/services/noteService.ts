@@ -14,7 +14,7 @@ export const fetchNotes = async (
 ): Promise<FetchNotesResponse> => {
 	const token = import.meta.env.VITE_NOTEHUB_TOKEN
 
-	const response = await axios.get(
+	const response = await axios.get<FetchNotesResponse>(
 		'https://notehub-public.goit.study/api/notes',
 		{
 			params: {
@@ -40,7 +40,7 @@ export interface CreateNoteData {
 export const createNote = async (note: CreateNoteData): Promise<Note> => {
 	const token = import.meta.env.VITE_NOTEHUB_TOKEN
 
-	const response = await axios.post(
+	const response = await axios.post<Note>(
 		'https://notehub-public.goit.study/api/notes',
 		note,
 		{
@@ -53,12 +53,17 @@ export const createNote = async (note: CreateNoteData): Promise<Note> => {
 	return response.data
 }
 
-export const deleteNote = async (id: number): Promise<void> => {
+export const deleteNote = async (id: number): Promise<Note> => {
 	const token = import.meta.env.VITE_NOTEHUB_TOKEN
 
-	await axios.delete(`https://notehub-public.goit.study/api/notes/${id}`, {
-		headers: {
-			Authorization: `Bearer ${token}`,
-		},
-	})
+	const response = await axios.delete<Note>(
+		`https://notehub-public.goit.study/api/notes/${id}`,
+		{
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		}
+	)
+
+	return response.data
 }

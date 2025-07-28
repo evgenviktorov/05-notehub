@@ -1,24 +1,23 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useFormik } from 'formik'
 import * as Yup from 'yup'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { createNote } from '../../services/noteService'
 import css from './NoteForm.module.css'
-
-const initialValues = {
-	title: '',
-	content: '',
-	tag: '',
-}
-
-const validationSchema = Yup.object({
-	title: Yup.string().required('Title is required'),
-	content: Yup.string().required('Content is required'),
-	tag: Yup.string().required('Tag is required'),
-})
 
 interface NoteFormProps {
 	onClose: () => void
 }
+
+const validationSchema = Yup.object().shape({
+	title: Yup.string()
+		.min(3, 'Must be at least 3 characters')
+		.max(50, 'Must be at most 50 characters')
+		.required('Title is required'),
+	content: Yup.string().max(500, 'Must be at most 500 characters'),
+	tag: Yup.string()
+		.oneOf(['Todo', 'Work', 'Personal', 'Meeting', 'Shopping'], 'Invalid tag')
+		.required('Tag is required'),
+})
 
 export default function NoteForm({ onClose }: NoteFormProps) {
 	const queryClient = useQueryClient()
@@ -26,63 +25,59 @@ export default function NoteForm({ onClose }: NoteFormProps) {
 	const mutation = useMutation({
 		mutationFn: createNote,
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['notes'] }) // оновити список нотаток
+			queryClient.invalidateQueries({ queryKey: ['notes'] })
+			onClose()
 		},
 	})
 
 	const formik = useFormik({
-		initialValues,
+		initialValues: {
+			title: '',
+			content: '',
+			tag: '',
+		},
 		validationSchema,
 		onSubmit: values => {
-			mutation.mutate(values, {
-				onSuccess: () => {
-					formik.resetForm()
-					onClose() // <-- Закриває модалку
-				},
-			})
+			mutation.mutate(values)
 		},
 	})
 
 	return (
 		<form className={css.form} onSubmit={formik.handleSubmit}>
-			<div className={css.formGroup}>
-				<label htmlFor='title'>Title</label>
+			<label className={css.label}>
+				Title
 				<input
-					id='title'
+					className={css.input}
 					type='text'
 					name='title'
-					className={css.input}
 					value={formik.values.title}
 					onChange={formik.handleChange}
 					onBlur={formik.handleBlur}
 				/>
 				{formik.touched.title && formik.errors.title && (
-					<span className={css.error}>{formik.errors.title}</span>
+					<p className={css.error}>{formik.errors.title}</p>
 				)}
-			</div>
+			</label>
 
-			<div className={css.formGroup}>
-				<label htmlFor='content'>Content</label>
+			<label className={css.label}>
+				Content
 				<textarea
-					id='content'
+					className={css.input}
 					name='content'
-					rows={8}
-					className={css.textarea}
 					value={formik.values.content}
 					onChange={formik.handleChange}
 					onBlur={formik.handleBlur}
 				/>
 				{formik.touched.content && formik.errors.content && (
-					<span className={css.error}>{formik.errors.content}</span>
+					<p className={css.error}>{formik.errors.content}</p>
 				)}
-			</div>
+			</label>
 
-			<div className={css.formGroup}>
-				<label htmlFor='tag'>Tag</label>
+			<label className={css.label}>
+				Tag
 				<select
-					id='tag'
+					className={css.input}
 					name='tag'
-					className={css.select}
 					value={formik.values.tag}
 					onChange={formik.handleChange}
 					onBlur={formik.handleBlur}
@@ -95,23 +90,20 @@ export default function NoteForm({ onClose }: NoteFormProps) {
 					<option value='Shopping'>Shopping</option>
 				</select>
 				{formik.touched.tag && formik.errors.tag && (
-					<span className={css.error}>{formik.errors.tag}</span>
+					<p className={css.error}>{formik.errors.tag}</p>
 				)}
-			</div>
+			</label>
 
 			<div className={css.actions}>
 				<button
-					type='button'
-					className={css.cancelButton}
-					onClick={() => {
-						formik.resetForm()
-						onClose()
-					}}
+					className={css.button}
+					type='submit'
+					disabled={mutation.isPending}
 				>
-					Cancel
+					Create
 				</button>
-				<button type='submit' className={css.submitButton} disabled={false}>
-					Create note
+				<button className={css.button} type='button' onClick={onClose}>
+					Cancel
 				</button>
 			</div>
 		</form>
