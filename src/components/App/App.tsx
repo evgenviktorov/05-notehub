@@ -33,7 +33,13 @@ export default function App() {
 						onPageChange={setPage}
 					/>
 				)}
-				<SearchBox value={search} onChange={setSearch} />
+				<SearchBox
+					value={search}
+					onChange={value => {
+						setSearch(value)
+						setPage(1)
+					}}
+				/>
 			</header>
 
 			<NoteList
