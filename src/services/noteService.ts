@@ -53,7 +53,7 @@ export const createNote = async (note: CreateNoteData): Promise<Note> => {
 	return response.data
 }
 
-export const deleteNote = async (id: number): Promise<Note> => {
+export const deleteNote = async (id: string): Promise<Note> => {
 	const token = import.meta.env.VITE_NOTEHUB_TOKEN
 
 	const response = await axios.delete<Note>(
